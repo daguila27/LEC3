@@ -21,7 +21,7 @@ normal <- function(u, theta, n){
 }
 estandar <- normal(0, 1, 1000)
 hist(estandar)
-plot(function(estandar) dnorm(estandar), -5, 5, main = "Función de Densidad")
+#plot(function(estandar) dnorm(estandar), -5, 5, main = "Función de Densidad")
 ```
 2.- Usando muestras normales estándar obtenga una distribución chi-square. Especifique los parámetros.
 
@@ -48,7 +48,8 @@ hist(tstudent)
 4.- Análogamente, obtenga la distribución Log-normal.
 
 ```{r}
-
+lognormal <- exp(normal(0,1,1000))
+hist(lognormal)
 ```
 
 
