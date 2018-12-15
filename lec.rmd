@@ -21,7 +21,7 @@ normal <- function(u, theta, n){
 }
 estandar <- normal(0, 1, 1000)
 hist(estandar)
-#plot(function(estandar) dnorm(estandar), -5, 5, main = "Función de Densidad")
+plot(function(x) dnorm(x), -5, 5, main = "Función de Densidad")
 ```
 2.- Usando muestras normales estándar obtenga una distribución chi-square. Especifique los parámetros.
 
@@ -35,21 +35,23 @@ jicuadrado <- function(n, gl){
 }
 chisquare <- jicuadrado(1000,5)
 hist(chisquare)
-#plot(function(x) dchisq(x), -1, 10, main = "Función de Densidad")
+plot(function(x, df) dchisq(x, df=5), -1, 20, main = "Función de Densidad")
 ```
 
 
 3.- Análogamente, obtenga la distribución t-student.
 ```{r}
 tstudent <- normal(0,1,1000)/sqrt(jicuadrado(1000, 5) / 5)
-hist(tstudent)
+hist(tstudent, 12 )
+plot(function(x, df) dt(x, df=5), -6, 6, main = "Función de Densidad")
 ```
 
 4.- Análogamente, obtenga la distribución Log-normal.
 
 ```{r}
 lognormal <- exp(normal(0,1,1000))
-hist(lognormal)
+hist(lognormal, 12)
+plot(function(x) dlnorm(x), 0, 35, main = "Función de Densidad")
 ```
 
 
@@ -79,6 +81,20 @@ principal factor el soporte de una distribuci´on.
 MLE (Maximum Likelihood Estimator) es uno de los estimadores mas conocidos en la inferencia frecuentista debido a las propiedades que posee, a pesar de que muchas veces no es posible obtener este estimador de forma anal´itica.
 
 1.- Defina una funci´on que permita obtener el estimador m´aximo veros´imil para los par´ametros de las distribuciones normal, gamma y weibull respecto de una muestra. Para poder realizar esto es necesario utilizar un solver para optimizar la funci´on de verosimilitud. Explore el uso de optim() (en python, revisar scipy.optimize).
+
+```{r}
+funcionDensidad <- function(dist, n){
+  aux <- 1
+  print(rnorm(1000))
+  for(i in 1:n){
+    aux <- aux*dist;
+  }
+  print(aux)
+}
+funcionDensidad(dnorm(1000), 1000)
+```
+
+
 
 2.- Obtenga muestras para las 3 distribuciones anteriores especificando los par´ametros y calcule la m´axima verosimilitud. Compare sus resultados en una tabla.
 
