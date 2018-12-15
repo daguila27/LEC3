@@ -1,0 +1,97 @@
+---
+title: "Laboratorio N°3 - Estadística Computacional"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 1. Preguntas 
+
+### 1.1. Distribuciones derivadas de la normal
+Teóricamente se explica como surgen distintas distribuciones derivadas de una distribución normal. Comprobaremos
+estas afirmaciones en el siguiente ejercicio. En cada pregunta debe graficar el histograma de la
+muestra y la función de densidad para comprobar su resultado. Recuerde especificar que parámetros usó y el tamaño de la muestra (ideal > 1000).
+
+1.- Usando muestra normal arbitraria obtenga una distribución normal estándar.
+```{r}
+normal <- function(u, theta, n){
+  return((rnorm(n)*theta)+u)
+}
+estandar <- normal(0, 1, 1000)
+hist(estandar)
+plot(function(estandar) dnorm(estandar), -5, 5, main = "Función de Densidad")
+```
+2.- Usando muestras normales estándar obtenga una distribución chi-square. Especifique los parámetros.
+
+```{r}
+jicuadrado <- function(n, gl){
+  suma <- 0
+  for(i in 1:gl){
+      suma <- suma+(normal(0,1,1000)^2)
+  }
+  return(suma)
+}
+chisquare <- jicuadrado(1000,5)
+hist(chisquare)
+#plot(function(x) dchisq(x), -1, 10, main = "Función de Densidad")
+```
+
+
+3.- Análogamente, obtenga la distribución t-student.
+```{r}
+tstudent <- normal(0,1,1000)/sqrt(jicuadrado(1000, 5) / 5)
+hist(tstudent)
+```
+
+4.- Análogamente, obtenga la distribución Log-normal.
+
+```{r}
+
+```
+
+
+### 1.2. Muestreo de distribuciones
+Una empresa desea probar sus modelos predictivos, pero no tiene la capacidad de obtener datos nuevos de forma rápida. Usted se encarga de ver como poder solucionar esta situación, y como respuesta propone muestrear distribuciones con parámetros que son obtenidos de expertos del dominio para obtener datos sintéticos. Los datos que la empresa necesita tienen la siguiente estructura:
+
+Índice de asistencia: Número continuo entre 0 y 1, con valor medio 0.8 .
+
+Calidad del trabajo: N´umero continuo entre 0 y 5, con valor medio 4.5 .
+
+Edad: N´umero entero con media 30.
+
+Dinero en miles de pesos: N´umero continuo positivo con media 1000.
+
+Puntaje evaluaci´on: N´umero real con media 50.
+
+Para evitar problemas con par´ametros y sistemas de ecuaciones, las varianzas no se especifican.
+
+1.- Explique que distribuci´on y sus respectivos par´ametros ser´ian correctos para muestrear los datos para la empresa. Hint: Justifique sus respuestas considerando como 
+principal factor el soporte de una distribuci´on.
+
+2.- Obtenga una muestra de 1000 trabajadores y compruebe que sus datos concuerden con los par´ametros (medias) especificados anteriormente.
+
+
+### 1.3. Máxima verosimilitud
+
+MLE (Maximum Likelihood Estimator) es uno de los estimadores mas conocidos en la inferencia frecuentista debido a las propiedades que posee, a pesar de que muchas veces no es posible obtener este estimador de forma anal´itica.
+
+1.- Defina una funci´on que permita obtener el estimador m´aximo veros´imil para los par´ametros de las distribuciones normal, gamma y weibull respecto de una muestra. Para poder realizar esto es necesario utilizar un solver para optimizar la funci´on de verosimilitud. Explore el uso de optim() (en python, revisar scipy.optimize).
+
+2.- Obtenga muestras para las 3 distribuciones anteriores especificando los par´ametros y calcule la m´axima verosimilitud. Compare sus resultados en una tabla.
+
+3.- Obtenga los valores del estimador con la funci´on fitdistr() del paquete MASS (Si usa python, use el estimador presente en scipy.stats) y comp´arelos con los valores del estimador obtenidos por su funci´on.
+
+
+### 1.4. Bootstrapping y estadísticas
+
+Con el uso del remuestreo bootstrap, podemos analizar las distribuciones emp´iricas correspondientes distintas estad´isticas. Usando el paquete "boot" en R (bootstrapped en Python) se facilita el an´alisis de las estad´isticas. Para los siguientes preguntas, usar como m´inimo 5000 muestras booststrap.
+
+Genera una muestra aleatoria normal de 10000 datos con media 10 y varianza 10.
+Obtenga la distribuci´on emp´irica (histograma) para las siguientes medidas de tendencia central: Media aritm´etica, Media geom´etrica, Media arm´onica, Mediana, Moda.
+
+Obtenga la distribuci´on emp´irica (histograma) para las siguientes medidas de dispersi´on: 
+Desviaci´on est´andar, Desviaci´on Absoluta, Rango, IQR y rango medio.
+
+## 2. Conclusiones
