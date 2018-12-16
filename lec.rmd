@@ -23,6 +23,7 @@ estandar <- normal(0, 1, 1000)
 hist(estandar)
 plot(function(x) dnorm(x), -5, 5, main = "Función de Densidad")
 ```
+
 2.- Usando muestras normales estándar obtenga una distribución chi-square. Especifique los parámetros.
 
 ```{r}
@@ -59,14 +60,40 @@ plot(function(x) dlnorm(x), 0, 35, main = "Función de Densidad")
 Una empresa desea probar sus modelos predictivos, pero no tiene la capacidad de obtener datos nuevos de forma rápida. Usted se encarga de ver como poder solucionar esta situación, y como respuesta propone muestrear distribuciones con parámetros que son obtenidos de expertos del dominio para obtener datos sintéticos. Los datos que la empresa necesita tienen la siguiente estructura:
 
 Índice de asistencia: Número continuo entre 0 y 1, con valor medio 0.8 .
+```{r}
+#SE NECESITA SABER QUE CUAL ES EL MENOR INDICE DE ASISTENCIA
+#QUE PORCENTAJE DE LOS EMPLEADOS ESTA BAJO LA MEDIA (< 80)
+datos <- floor(rt(1000, 100, 80))/100
+hist(datos,12)
+```
 
 Calidad del trabajo: N´umero continuo entre 0 y 5, con valor medio 4.5 .
+```{r}
+#MENOR CALIFICACION
+calidad <- rnorm(1000, 4.5)
+```
+
 
 Edad: N´umero entero con media 30.
 
+```{r}
+#EDAD DEL EMPLEADO MENOR Y EDAD DEL EMPLEADO MAYOR
+edades <- rnorm(1000, 30)
+```
+
+
 Dinero en miles de pesos: N´umero continuo positivo con media 1000.
 
+```{r}
+
+```
+
+
 Puntaje evaluaci´on: N´umero real con media 50.
+```{r}
+#SE NECESITA SABER LOS RANGOS DEL PUNTAJE
+```
+
 
 Para evitar problemas con par´ametros y sistemas de ecuaciones, las varianzas no se especifican.
 
@@ -112,7 +139,14 @@ OptimizarLogFunction <- function(dist, u, theta, muest){
     indDistribucion <- 1
     nombre <- "Gamma"
   }
-  LogSimilOptimizado <- optim(par = c(u, theta, indDistribucion), fn = LogSimilitud, method=c("L-BFGS-B"), lower = c(0, 0, 0), upper = c(Inf,Inf, 2), x = muest)
+  LogSimilOptimizado <- optim(
+    par = c(u, theta, indDistribucion), 
+    fn = LogSimilitud, 
+    method=c("L-BFGS-B"), 
+    lower = c(0, 0, 0), 
+    upper = c(Inf,Inf, 2), 
+    x = muest
+  )
   print(paste("Maxima Verosimilitud para Distribución", nombre, sep=" "))
   LogSimilOptimizado$par[2]
 }
