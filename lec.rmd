@@ -83,15 +83,70 @@ MLE (Maximum Likelihood Estimator) es uno de los estimadores mas conocidos en la
 1.- Defina una funci´on que permita obtener el estimador m´aximo veros´imil para los par´ametros de las distribuciones normal, gamma y weibull respecto de una muestra. Para poder realizar esto es necesario utilizar un solver para optimizar la funci´on de verosimilitud. Explore el uso de optim() (en python, revisar scipy.optimize).
 
 ```{r}
-funcionDensidad <- function(dist, n){
-  aux <- 1
-  print(rnorm(1000))
-  for(i in 1:n){
-    aux <- aux*dist;
+#"optim" (que también sirve para maximizar funciones -útil, pues, para métodos de Máxima Verosimilitud)
+NormalMenosLogSimilitud <- function(par, x){
+  n <- length(x)
+  f <- rep(0, n)
+  for (i in 1:n){
+    f[i] <- -dnorm(x[i], par[1], par[2], log=TRUE)
   }
-  print(aux)
+  return(sum(f))
 }
-funcionDensidad(dnorm(1000), 1000)
+GammaMenosLogSimilitud <- function(par, x){
+  #print(x)
+  n <- length(x)
+  f <- rep(0, n)
+  for (i in 1:n){
+    f[i] <- -dgamma(x[i], shape=par[1], log=TRUE)
+  }
+  return(sum(f))
+}
+
+WeiBullMenosLogSimilitud <- function(par, x){
+  n <- length(x)
+  f <- rep(0, n)
+  for (i in 1:n){
+    f[i] <- -dweibull(x[i], shape=par[1], log=TRUE)
+  }
+  return(sum(f))
+}
+LogSimilitud <- function(par, x){
+  # par = u - theta - distribucion
+  n <- length(x)
+  f <- rep(0, n)
+  for (i in 1:n){
+    if(par[3] == 'weibull'){
+      f[i] <- -dweibull(x[i], shape=par[2], log=TRUE)
+    }
+    else if(par[3] == 'gamma'){
+      f[i] <- -dgamma(x[i], shape=par[2], log=TRUE)
+    }
+    else{
+      f[i] <- -dnorm(x[i], par[1], par[2], log=TRUE)
+    }
+  }
+  return(sum(f))
+} 
+OptimizarLogFunction <- function(dist, u, theta){
+  muestra <- 0
+  if(dist == 'weibull'){
+    muestra <- rweibull(100, shape=theta)
+  }
+  else if(dist == 'gamma'){
+    muestra <- rgamma(100, shape=theta)
+  }
+  else{
+    muestra <- rnorm(100, u, theta)
+  }
+  
+  LogSimilOptimizado <- optim(par = c(u, theta, dist), fn = LogSimilitud, method=c("L-BFGS-B"), lower = c(-Inf, 0), upper = c(Inf,Inf), x = muestra)
+  
+  LogSimilOptimizado$par
+}
+OptimizarLogFunction('normal', 6, 3)
+OptimizarLogFunction('gamma', 6, 3)
+OptimizarLogFunction('weibull', 6, 3)
+
 ```
 
 
