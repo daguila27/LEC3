@@ -83,42 +83,15 @@ MLE (Maximum Likelihood Estimator) es uno de los estimadores mas conocidos en la
 1.- Defina una funci´on que permita obtener el estimador m´aximo veros´imil para los par´ametros de las distribuciones normal, gamma y weibull respecto de una muestra. Para poder realizar esto es necesario utilizar un solver para optimizar la funci´on de verosimilitud. Explore el uso de optim() (en python, revisar scipy.optimize).
 
 ```{r}
-#"optim" (que también sirve para maximizar funciones -útil, pues, para métodos de Máxima Verosimilitud)
-NormalMenosLogSimilitud <- function(par, x){
-  n <- length(x)
-  f <- rep(0, n)
-  for (i in 1:n){
-    f[i] <- -dnorm(x[i], par[1], par[2], log=TRUE)
-  }
-  return(sum(f))
-}
-GammaMenosLogSimilitud <- function(par, x){
-  #print(x)
-  n <- length(x)
-  f <- rep(0, n)
-  for (i in 1:n){
-    f[i] <- -dgamma(x[i], shape=par[1], log=TRUE)
-  }
-  return(sum(f))
-}
-
-WeiBullMenosLogSimilitud <- function(par, x){
-  n <- length(x)
-  f <- rep(0, n)
-  for (i in 1:n){
-    f[i] <- -dweibull(x[i], shape=par[1], log=TRUE)
-  }
-  return(sum(f))
-}
 LogSimilitud <- function(par, x){
-  # par = u - theta - distribucion
+  # par = u - theta - indDistribucion
   n <- length(x)
   f <- rep(0, n)
   for (i in 1:n){
-    if(par[3] == 'weibull'){
+    if(par[3] == 2){
       f[i] <- -dweibull(x[i], shape=par[2], log=TRUE)
     }
-    else if(par[3] == 'gamma'){
+    else if(par[3] == 1){
       f[i] <- -dgamma(x[i], shape=par[2], log=TRUE)
     }
     else{
@@ -127,25 +100,22 @@ LogSimilitud <- function(par, x){
   }
   return(sum(f))
 } 
-OptimizarLogFunction <- function(dist, u, theta){
+OptimizarLogFunction <- function(dist, u, theta, muest){
   muestra <- 0
+  indDistribucion <- 0
+  nombre <- "Normal"
   if(dist == 'weibull'){
-    muestra <- rweibull(100, shape=theta)
+    indDistribucion <- 2
+    nombre <- "WeiBull"
   }
   else if(dist == 'gamma'){
-    muestra <- rgamma(100, shape=theta)
+    indDistribucion <- 1
+    nombre <- "Gamma"
   }
-  else{
-    muestra <- rnorm(100, u, theta)
-  }
-  
-  LogSimilOptimizado <- optim(par = c(u, theta, dist), fn = LogSimilitud, method=c("L-BFGS-B"), lower = c(-Inf, 0), upper = c(Inf,Inf), x = muestra)
-  
-  LogSimilOptimizado$par
+  LogSimilOptimizado <- optim(par = c(u, theta, indDistribucion), fn = LogSimilitud, method=c("L-BFGS-B"), lower = c(0, 0, 0), upper = c(Inf,Inf, 2), x = muest)
+  print(paste("Maxima Verosimilitud para Distribución", nombre, sep=" "))
+  LogSimilOptimizado$par[2]
 }
-OptimizarLogFunction('normal', 6, 3)
-OptimizarLogFunction('gamma', 6, 3)
-OptimizarLogFunction('weibull', 6, 3)
 
 ```
 
@@ -153,7 +123,25 @@ OptimizarLogFunction('weibull', 6, 3)
 
 2.- Obtenga muestras para las 3 distribuciones anteriores especificando los par´ametros y calcule la m´axima verosimilitud. Compare sus resultados en una tabla.
 
+```{r}
+muestNormal <- rnorm(100, 6, 3)
+muestGamma <- rgamma(100, shape=3)
+muestWeiBull <- rweibull(100, shape=3)
+OptimizarLogFunction('normal', 6, 3, muestNormal)
+OptimizarLogFunction('gamma', 6, 3, muestGamma)
+OptimizarLogFunction('weibull', 6, 3, muestWeiBull)
+```
+
+
 3.- Obtenga los valores del estimador con la funci´on fitdistr() del paquete MASS (Si usa python, use el estimador presente en scipy.stats) y comp´arelos con los valores del estimador obtenidos por su funci´on.
+```{r}
+library(MASS)
+fitdistr(muestNormal, dnorm, list(mean=6,sd = 3), lower = 0)
+
+fitdistr(muestGamma, dgamma, list(shape = 3), lower = 0)
+
+fitdistr(muestWeiBull, dweibull, list(shape = 3), lower = 0)
+```
 
 
 ### 1.4. Bootstrapping y estadísticas
