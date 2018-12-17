@@ -60,47 +60,57 @@ plot(function(x) dlnorm(x), 0, 35, main = "Función de Densidad")
 Una empresa desea probar sus modelos predictivos, pero no tiene la capacidad de obtener datos nuevos de forma rápida. Usted se encarga de ver como poder solucionar esta situación, y como respuesta propone muestrear distribuciones con parámetros que son obtenidos de expertos del dominio para obtener datos sintéticos. Los datos que la empresa necesita tienen la siguiente estructura:
 
 Índice de asistencia: Número continuo entre 0 y 1, con valor medio 0.8 .
-```{r}
-#SE NECESITA SABER QUE CUAL ES EL MENOR INDICE DE ASISTENCIA
-#QUE PORCENTAJE DE LOS EMPLEADOS ESTA BAJO LA MEDIA (< 80)
-datos <- floor(rt(1000, 100, 80))/100
-hist(datos,12)
-```
 
 Calidad del trabajo: N´umero continuo entre 0 y 5, con valor medio 4.5 .
-```{r}
-#MENOR CALIFICACION
-calidad <- rnorm(1000, 4.5)
-```
-
 
 Edad: N´umero entero con media 30.
 
-```{r}
-#EDAD DEL EMPLEADO MENOR Y EDAD DEL EMPLEADO MAYOR
-edades <- rnorm(1000, 30)
-```
-
-
 Dinero en miles de pesos: N´umero continuo positivo con media 1000.
 
-```{r}
-
-```
-
-
 Puntaje evaluaci´on: N´umero real con media 50.
-```{r}
-#SE NECESITA SABER LOS RANGOS DEL PUNTAJE
-```
 
 
-Para evitar problemas con par´ametros y sistemas de ecuaciones, las varianzas no se especifican.
+Para evitar problemas con parámetros y sistemas de ecuaciones, las varianzas no se especifican.
 
-1.- Explique que distribuci´on y sus respectivos par´ametros ser´ian correctos para muestrear los datos para la empresa. Hint: Justifique sus respuestas considerando como 
+1.- Explique que distribucióon y sus respectivos parámetros ser´ian correctos para muestrear los datos para la empresa. Hint: Justifique sus respuestas considerando como 
 principal factor el soporte de una distribuci´on.
 
-2.- Obtenga una muestra de 1000 trabajadores y compruebe que sus datos concuerden con los par´ametros (medias) especificados anteriormente.
+Para el índice de asistencia consideramos que la distribución correcta sería la distribución Beta pues tiene un soporte los valores del intervalo $[0,1]$. Los valores de los parámetros serían $\alpha = 10$ y $\beta = 2.5$.
+
+Para la calidad del trabajo, al igual que el índice de asistencia, utilizamos la distribución Beta pero ajustada al intervalo $[0,5]$. Los valores de los parámetros serían $\alpha = 10$ y $\beta = 1.11$.
+
+Para la edad utilizamos la distribución Gamma con los valores no enteros aproximados al valor entero directamente menor, pues el soporte de la distribución son los números reales positivos. Los parámetros serían $k=2$ y $\theta = 15$.
+
+Para la cantidad de dinero en miles de pesos también utilizamos la distribución Gamma pero con los parámetros $k = 4$ y $\theta = 250$.
+
+Para el puntaje de evaluación, como se trata de un número real utilizamos la distribución Normal Gaussiana, con parámetro $\mu = 50$ y $\delta = 7$ pues se asume que los valores de la evaluación van de 0 a 100.
+
+2.- Obtenga una muestra de 1000 trabajadores y compruebe que sus datos concuerden con los parámetros (medias) especificados anteriormente.
+
+```{r}
+indiceAsistencia <- rbeta(1000, 10, 2.5)
+
+calidadTrabajo <- rbeta(1000, 10, 1.11)*5
+
+edad <- floor(rgamma(1000, 2, scale = 15))
+
+dinero <- rgamma(1000, 4, 250)
+
+puntajeEvaluacion <- rnorm(10000, 50, 7)
+
+#Debería ser aproximadamente 0.8
+mean(indiceAsistencia)
+#Debería ser aproximadamente 4.5
+mean(calidadTrabajo)
+#Debería ser aproximadamente 30
+mean(edad)
+#Debería ser aproximadamente 1000
+mean(dinero)
+#Debería ser aproximadamente 50
+mean(puntajeEvaluacion)
+
+```
+
 
 
 ### 1.3. Máxima verosimilitud
