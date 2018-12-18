@@ -15,16 +15,44 @@ estas afirmaciones en el siguiente ejercicio. En cada pregunta debe graficar el 
 muestra y la función de densidad para comprobar su resultado. Recuerde especificar que parámetros usó y el tamaño de la muestra (ideal > 1000).
 
 1.- Usando muestra normal arbitraria obtenga una distribución normal estándar.
+
+En base a la tranformación entre una distribución Normal $Z$ de  media $\mu=0$ y desviación estandar $\theta=1$ y una distribución Normal $X$ de parametros $\mu=\mu'$ y $\theta=\theta'$
+   
+   $Z = \frac{(X - \mu')}{\theta'}$ 
+   
+   Despejando $X$:
+   
+   $X = Z*\theta' + \mu'$
+
+Esto lo representamos en la siguiente funcion a la que llamaremos $normal$ y retornará una distribucion Normal estandar con media $u$, desviacion estandar $theta$  y $n$ datos.
+
+
 ```{r}
 normal <- function(u, theta, n){
   return((rnorm(n)*theta)+u)
 }
-estandar <- normal(0, 1, 1000)
+```
+
+A continuación, se genera una distribución con la función recién definida, esta de media $3$, desviación estandar $1$ y con $1000$ datos.
+
+```{r}
+estandar <- normal(3, 1, 1000)
 hist(estandar)
-plot(function(x) dnorm(x), -5, 5, main = "Función de Densidad")
+```
+
+Finalmente comparamos el histograma obtenido con la función de densidad de la Normal (la función que está incluida en R) para comprobar que si coinciden en su distribución.
+
+```{r}
+plot(function(x) dnorm(x), -5, 5, main = "Función de Densidad Distribución Normal")
 ```
 
 2.- Usando muestras normales estándar obtenga una distribución chi-square. Especifique los parámetros.
+
+Utilizando la definición de la distribucion Chi-square:
+
+$\displaystyle X=Z_{1}^{2}+\cdots +Z_{k}^{2}$
+
+Donde $\displaystyle Z_{i}$ son variables aleatorias normales independientes de media cero y varianza uno. Podemos programar facilmente una función para generar la distribución en base a una suma de normales, utilizando como parametros $n$ (largo de la muestra) y $gl$ (grados de libertad).
 
 ```{r}
 jicuadrado <- function(n, gl){
@@ -34,24 +62,57 @@ jicuadrado <- function(n, gl){
   }
   return(suma)
 }
+```
+
+Se genera una muestra de distribución Chi-square con $n = 1000$ y $gl = 5$.  
+ 
+```{r}
 chisquare <- jicuadrado(1000,5)
 hist(chisquare)
+```
+
+Comparamos con la función densidad de Chi-square. 
+
+```{r}
 plot(function(x, df) dchisq(x, df=5), -1, 20, main = "Función de Densidad")
 ```
 
 
 3.- Análogamente, obtenga la distribución t-student.
+
+Al igual que en el item anterior usamos:
+
+$\displaystyle T={\frac {Z}{\sqrt {V/\nu \ }}}$
+
+Donde $T$ es una distribucion T-student, $Z$ es una variable aleatoria con distribución normal y $V$ es una variable continua que sigue una distribución Chi-square. Entonces definimos la distribución T-student según la anterior formula, obviamente obteniendo las distribuciones Normales y Chi-square con las mismas funciones definidas previamente.
+
 ```{r}
 tstudent <- normal(0,1,1000)/sqrt(jicuadrado(1000, 5) / 5)
 hist(tstudent, 12 )
+```
+
+Comparamos con la función de densidad de la distribución T-student.
+
+```{r}
 plot(function(x, df) dt(x, df=5), -6, 6, main = "Función de Densidad")
 ```
 
 4.- Análogamente, obtenga la distribución Log-normal.
 
+Según definición de la Log-normal.
+
+$Log-N = e^N$; con $N$ una distribución normal. 
+
+Seguidamente generamos la Log-normal con un distribución normal base de media 0 y varianza 1.
+
 ```{r}
 lognormal <- exp(normal(0,1,1000))
 hist(lognormal, 12)
+```
+
+Comparamos con la función densidad.
+
+```{r}
 plot(function(x) dlnorm(x), 0, 35, main = "Función de Densidad")
 ```
 
@@ -183,9 +244,38 @@ fitdistr(muestWeiBull, dweibull, list(shape = 3), lower = 0)
 Con el uso del remuestreo bootstrap, podemos analizar las distribuciones emp´iricas correspondientes distintas estad´isticas. Usando el paquete "boot" en R (bootstrapped en Python) se facilita el an´alisis de las estad´isticas. Para los siguientes preguntas, usar como m´inimo 5000 muestras booststrap.
 
 Genera una muestra aleatoria normal de 10000 datos con media 10 y varianza 10.
+
+```{r}
+muestraNormal4 <- rnorm(10000, 10, 10)
+```
+
+
 Obtenga la distribuci´on emp´irica (histograma) para las siguientes medidas de tendencia central: Media aritm´etica, Media geom´etrica, Media arm´onica, Mediana, Moda.
+
+```{r}
+library(boot)
+Mode <- function(x) {
+  ux <- unique(x)
+  ux[which.max(tabulate(match(x, ux)))]
+}
+bootTest <- function(data, original){
+  remuestreo <- sample(data, size=length(data)-1,replace=TRUE)
+  armonic<-length(remuestreo)/sum(1/remuestreo)
+  desvMed <- (1/length(remuestreo))*(sum(abs(remuestreo-mean(remuestreo))))
+  #print(range(remuestreo,na.rm=TRUE)[1])
+  IQR <- quantile(remuestreo, 0.25)-quantile(remuestreo, 0.75)
+  rangoMed <- (max(remuestreo)+min(remuestreo))/2
+  rango <- max(remuestreo)-min(remuestreo)
+  return(c(mean(remuestreo), armonic, median(remuestreo), Mode(remuestreo), var(remuestreo)^(0.5), desvMed,  IQR,rango, rangoMed, range(remuestreo,na.rm=TRUE)))
+}
+boot(data=muestraNormal4, statistic=bootTest, R=5000)
+```
+
+
 
 Obtenga la distribuci´on emp´irica (histograma) para las siguientes medidas de dispersi´on: 
 Desviaci´on est´andar, Desviaci´on Absoluta, Rango, IQR y rango medio.
+
+
 
 ## 2. Conclusiones
